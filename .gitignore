@@ -1,0 +1,37 @@
+# --- Secrets ---
+.env
+.env.local
+*.pem
+
+# --- Dev fallback vector store ---
+.local_vectors/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# --- Node / Next.js ---
+node_modules/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+# Note: web/lib/api/generated.ts IS committed (generated from the API OpenAPI schema via
+# `npm run gen:api`) so `web` typechecks standalone in CI without booting the backend.
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Celery beat runtime ---
+celerybeat-schedule*

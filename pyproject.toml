@@ -1,0 +1,83 @@
+[project]
+name = "continuity-api"
+version = "0.1.0"
+description = "KT Platform (Continuity) — FastAPI backend: ingestion, RAG, interview, synthesis, evals"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "sqlalchemy>=2.0.36",
+    "alembic>=1.14",
+    "psycopg[binary]>=3.2",
+    "celery>=5.4",
+    # Local dev Redis on Windows is 5.0.x, which lacks the RESP3 `HELLO` handshake that
+    # redis-py >=5 issues. Pin to 4.x (RESP2 only) so the client works against Redis 5.
+    "redis>=4.5.2,<5",
+    "pyjwt[crypto]>=2.10",
+    "httpx>=0.28",
+    "pinecone>=5.4",
+    "ollama>=0.4",
+    "sentry-sdk[fastapi]>=2.19",
+    "cryptography>=49.0.0",
+    "google-auth>=2.55.0",
+    "google-auth-oauthlib>=1.4.0",
+    "google-api-python-client>=2.197.0",
+    "pypdf>=6.13.2",
+    "python-docx>=1.2.0",
+    "markdown>=3.10.2",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["."]
+
+[tool.ruff.lint]
+# E/F pycodestyle+pyflakes, I import-sort, UP pyupgrade, B bugbear, ASYNC, RUF
+select = ["E", "F", "I", "UP", "B", "ASYNC", "RUF"]
+# B008: calling Depends()/Header() in argument defaults is the intended FastAPI pattern.
+ignore = ["B008"]
+
+[tool.ruff.lint.per-file-ignores]
+# Fixture prose for the eval corpus — long natural-language lines are fine.
+"evals/corpus.py" = ["E501"]
+# Demo/fixture prose (pre-written knowledge artifacts) — long lines are fine.
+"scripts/seed_demo.py" = ["E501"]
+"scripts/seed_activity.py" = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+# Alembic migration scripts are templated/generated; don't gate them on strict typing.
+exclude = ["alembic/versions/"]
+
+[[tool.mypy.overrides]]
+module = [
+    "celery.*",
+    "pinecone.*",
+    "googleapiclient.*",
+    "google_auth_oauthlib.*",
+    "google.*",
+    "docx.*",
+    "markdown.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
